@@ -42,7 +42,7 @@ bot.onText(/\/addserver (.+)/, async (msg, match) => {
     bot.sendMessage(msg.chat.id, `Server ${serverName} berhasil ditambahkan.`);
   } catch (error) {
     console.error('Error adding server:', error);
-    bot.sendMessage(msg.chat.id, 'Gagal menambahkan server.');
+    bot.sendMessage(msg.chat.id, `Gagal menambahkan server. Error: ${error.message}`);
   }
 });
 
@@ -63,7 +63,7 @@ bot.onText(/\/adduser (.+)/, async (msg, match) => {
     bot.sendMessage(msg.chat.id, `Pengguna ${username} berhasil ditambahkan.`);
   } catch (error) {
     console.error('Error adding user:', error);
-    bot.sendMessage(msg.chat.id, 'Gagal menambahkan pengguna.');
+    bot.sendMessage(msg.chat.id, `Gagal menambahkan pengguna. Error: ${error.message}`);
   }
 });
 
@@ -91,7 +91,7 @@ bot.onText(/\/addadmin (.+)/, async (msg, match) => {
     bot.sendMessage(msg.chat.id, `Administrator ${adminUsername} berhasil ditambahkan.`);
   } catch (error) {
     console.error('Error adding admin:', error);
-    bot.sendMessage(msg.chat.id, 'Gagal menambahkan administrator.');
+    bot.sendMessage(msg.chat.id, `Gagal menambahkan administrator. Error: ${error.message}`);
   }
 });
 
@@ -116,7 +116,7 @@ bot.onText(/\/checkuser (.+)/, async (msg, match) => {
     }
   } catch (error) {
     console.error('Error checking user:', error);
-    bot.sendMessage(msg.chat.id, 'Gagal melakukan pengecekan user.');
+    bot.sendMessage(msg.chat.id, `Gagal melakukan pengecekan user. Error: ${error.message}`);
   }
 });
 
@@ -141,7 +141,7 @@ bot.onText(/\/checkadmin (.+)/, async (msg, match) => {
     }
   } catch (error) {
     console.error('Error checking admin:', error);
-    bot.sendMessage(msg.chat.id, 'Gagal melakukan pengecekan admin.');
+    bot.sendMessage(msg.chat.id, `Gagal melakukan pengecekan admin. Error: ${error.message}`);
   }
 });
 
@@ -160,9 +160,11 @@ bot.onText(/\/deleteserver (.+)/, async (msg, match) => {
     bot.sendMessage(msg.chat.id, `Server ${serverName} berhasil dihapus.`);
   } catch (error) {
     console.error('Error deleting server:', error);
-    bot.sendMessage(msg.chat.id, 'Gagal menghapus server.');
+    bot.sendMessage(msg.chat.id, `Gagal menghapus server. Error: ${error.message}`);
   }
 });
+
+// ... (kode sebelumnya)
 
 bot.onText(/\/deleteuser (.+)/, async (msg, match) => {
   try {
@@ -176,4 +178,35 @@ bot.onText(/\/deleteuser (.+)/, async (msg, match) => {
       },
     });
 
-    bot.sendMessage(msg.chat.id
+    bot.sendMessage(msg.chat.id, `Pengguna ${username} berhasil dihapus.`);
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    bot.sendMessage(msg.chat.id, `Gagal menghapus pengguna. Error: ${error.message}`);
+  }
+});
+
+bot.onText(/\/deleteadmin (.+)/, async (msg, match) => {
+  try {
+    const adminUsername = match[1];
+    
+    // Implementasi penghapusan administrator dari Pterodactyl
+    // Sesuaikan dengan endpoint dan payload yang diperlukan oleh API Pterodactyl
+    const response = await axios.delete(`${pterodactylApiUrl}/users/${adminUsername}`, {
+      headers: {
+        Authorization: `Bearer ${pterodactylApiKey}`,
+      },
+    });
+
+    bot.sendMessage(msg.chat.id, `Administrator ${adminUsername} berhasil dihapus.`);
+  } catch (error) {
+    console.error('Error deleting admin:', error);
+    bot.sendMessage(msg.chat.id, `Gagal menghapus administrator. Error: ${error.message}`);
+  }
+});
+
+// Additional features go here...
+
+// Credits
+bot.onText(/\/credits/, (msg) => {
+  bot.sendMessage(msg.chat.id, 'Dibuat oleh YudaMods. Berikan kredit jika digunakan.');
+});
