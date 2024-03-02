@@ -8,7 +8,7 @@ const fs = require('fs');
 const token = 'YOUR_TELEGRAM_BOT_TOKEN';
 const pterodactylApiUrl = 'https://pterodactyl.example.com/api/application';
 const pterodactylApiKey = 'YOUR_PTERODACTYL_API_KEY';
-const ownerContact = '6283842204546'; // Ganti dengan nomor kontak owner yang sebenarnya
+const ownerContact = '628xxx'; // Ganti dengan nomor kontak owner yang sebenarnya
 const thumbPath = './user.png'; // Ganti dengan path sesuai dengan lokasi file di sistem Anda
 const bot = new TelegramBot(token, { polling: true });
 
