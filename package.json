@@ -1,13 +1,21 @@
 {
   "name": "pterodactyl-telegram-bot",
   "version": "1.0.0",
-  "description": "Bot Telegram By YudaMods",
+  "description": "Telegram Bot for Pterodactyl",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
+  "keywords": [
+    "telegram",
+    "bot",
+    "pterodactyl"
+  ],
+  "author": "YudaMods",
+  "license": "MIT",
   "dependencies": {
-    "node-telegram-bot-api": "^0.58.0",
-    "axios": "^0.24.0"
+    "axios": "^0.24.0",
+    "node-telegram-bot-api": "^0.72.0"
+    // Tambahkan dependensi lainnya jika diperlukan
   }
 }
