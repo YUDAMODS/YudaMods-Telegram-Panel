@@ -1,3 +1,5 @@
+// By YudaMods
+// Taruh Credits
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 
@@ -7,19 +9,107 @@ const pterodactylApiKey = 'YOUR_PTERODACTYL_API_KEY';
 
 const bot = new TelegramBot(token, { polling: true });
 
-bot.onText(/\/checkuser (.+)/, async (msg, match) => {
-  const username = match[1];
+bot.onText(/\/start/, (msg) => {
+  const chatId = msg.chat.id;
+  const startMessage = "Selamat datang di bot Pterodactyl!\n\n" +
+    "Berikut adalah fitur yang tersedia:\n" +
+    "/addserver [Nama Server] - Menambahkan server baru\n" +
+    "/adduser [Nama Pengguna] - Menambahkan pengguna baru\n" +
+    "/addadmin [Nama Admin] - Menambahkan administrator baru\n" +
+    "/checkuser [Nama Pengguna] - Memeriksa keberadaan pengguna\n" +
+    "/checkadmin [Nama Admin] - Memeriksa keberadaan administrator\n" +
+    "/deleteserver [Nama Server] - Menghapus server\n" +
+    "/deleteuser [Nama Pengguna] - Menghapus pengguna\n" +
+    "/deleteadmin [Nama Admin] - Menghapus administrator";
+  
+  bot.sendMessage(chatId, startMessage);
+});
 
+bot.onText(/\/addserver (.+)/, async (msg, match) => {
   try {
-    const response = await axios.get(
-      `${pterodactylApiUrl}/users`,
-      { headers: { Authorization: `Bearer ${pterodactylApiKey}` } }
-    );
+    const serverName = match[1];
+    
+    // Implementasi penambahan server ke Pterodactyl
+    const response = await axios.post(`${pterodactylApiUrl}/servers`, {
+      name: serverName,
+      // Sesuaikan dengan payload yang diperlukan oleh API Pterodactyl
+    }, {
+      headers: {
+        Authorization: `Bearer ${pterodactylApiKey}`,
+      },
+    });
 
-    const users = response.data.data;
-    const foundUser = users.find((user) => user.attributes.username === username);
+    bot.sendMessage(msg.chat.id, `Server ${serverName} berhasil ditambahkan.`);
+  } catch (error) {
+    console.error('Error adding server:', error);
+    bot.sendMessage(msg.chat.id, 'Gagal menambahkan server.');
+  }
+});
 
-    if (foundUser) {
+bot.onText(/\/adduser (.+)/, async (msg, match) => {
+  try {
+    const username = match[1];
+    
+    // Implementasi penambahan pengguna ke Pterodactyl
+    const response = await axios.post(`${pterodactylApiUrl}/users`, {
+      username: username,
+      // Sesuaikan dengan payload yang diperlukan oleh API Pterodactyl
+    }, {
+      headers: {
+        Authorization: `Bearer ${pterodactylApiKey}`,
+      },
+    });
+
+    bot.sendMessage(msg.chat.id, `Pengguna ${username} berhasil ditambahkan.`);
+  } catch (error) {
+    console.error('Error adding user:', error);
+    bot.sendMessage(msg.chat.id, 'Gagal menambahkan pengguna.');
+  }
+});
+
+bot.onText(/\/addadmin (.+)/, async (msg, match) => {
+  try {
+    const adminUsername = match[1];
+    
+    // Implementasi penambahan administrator ke Pterodactyl
+    const response = await axios.post(`${pterodactylApiUrl}/users`, {
+      username: adminUsername,
+      // Sesuaikan dengan payload yang diperlukan oleh API Pterodactyl
+    }, {
+      headers: {
+        Authorization: `Bearer ${pterodactylApiKey}`,
+      },
+    });
+
+    // Berikan hak admin kepada pengguna yang baru ditambahkan
+    await axios.post(`${pterodactylApiUrl}/users/${response.data.id}/administrative`, null, {
+      headers: {
+        Authorization: `Bearer ${pterodactylApiKey}`,
+      },
+    });
+
+    bot.sendMessage(msg.chat.id, `Administrator ${adminUsername} berhasil ditambahkan.`);
+  } catch (error) {
+    console.error('Error adding admin:', error);
+    bot.sendMessage(msg.chat.id, 'Gagal menambahkan administrator.');
+  }
+});
+
+bot.onText(/\/checkuser (.+)/, async (msg, match) => {
+  try {
+    const username = match[1];
+    
+    // Implementasi pengecekan keberadaan pengguna di Pterodactyl
+    const response = await axios.get(`${pterodactylApiUrl}/users`, {
+      params: {
+        filter: `username=${username}`,
+      },
+      headers: {
+        Authorization: `Bearer ${pterodactylApiKey}`,
+      },
+    });
+
+    if (response.data.data.length > 0) {
       bot.sendMessage(msg.chat.id, `User ${username} sudah terdaftar.`);
     } else {
       bot.sendMessage(msg.chat.id, `User ${username} belum terdaftar.`);
@@ -31,18 +121,20 @@ bot.onText(/\/checkuser (.+)/, async (msg, match) => {
 });
 
 bot.onText(/\/checkadmin (.+)/, async (msg, match) => {
-  const adminUsername = match[1];
-
   try {
-    const response = await axios.get(
-      `${pterodactylApiUrl}/administrators`,
-      { headers: { Authorization: `Bearer ${pterodactylApiKey}` } }
-    );
+    const adminUsername = match[1];
+    
+    // Implementasi pengecekan keberadaan administrator di Pterodactyl
+    const response = await axios.get(`${pterodactylApiUrl}/users`, {
+      params: {
+        filter: `username=${adminUsername}`,
+      },
+      headers: {
+        Authorization: `Bearer ${pterodactylApiKey}`,
+      },
+    });
 
-    const admins = response.data.data;
-    const foundAdmin = admins.find((admin) => admin.attributes.username === adminUsername);
-
-    if (foundAdmin) {
+    if (response.data.data.length > 0) {
       bot.sendMessage(msg.chat.id, `Admin ${adminUsername} sudah terdaftar.`);
     } else {
       bot.sendMessage(msg.chat.id, `Admin ${adminUsername} belum terdaftar.`);
@@ -53,4 +145,35 @@ bot.onText(/\/checkadmin (.+)/, async (msg, match) => {
   }
 });
 
-console.log('Bot is running...');
+bot.onText(/\/deleteserver (.+)/, async (msg, match) => {
+  try {
+    const serverName = match[1];
+    
+    // Implementasi penghapusan server dari Pterodactyl
+    // Sesuaikan dengan endpoint dan payload yang diperlukan oleh API Pterodactyl
+    const response = await axios.delete(`${pterodactylApiUrl}/servers/${serverName}`, {
+      headers: {
+        Authorization: `Bearer ${pterodactylApiKey}`,
+      },
+    });
+
+    bot.sendMessage(msg.chat.id, `Server ${serverName} berhasil dihapus.`);
+  } catch (error) {
+    console.error('Error deleting server:', error);
+    bot.sendMessage(msg.chat.id, 'Gagal menghapus server.');
+  }
+});
+
+bot.onText(/\/deleteuser (.+)/, async (msg, match) => {
+  try {
+    const username = match[1];
+    
+    // Implementasi penghapusan pengguna dari Pterodactyl
+    // Sesuaikan dengan endpoint dan payload yang diperlukan oleh API Pterodactyl
+    const response = await axios.delete(`${pterodactylApiUrl}/users/${username}`, {
+      headers: {
+        Authorization: `Bearer ${pterodactylApiKey}`,
+      },
+    });
+
+    bot.sendMessage(msg.chat.id
