@@ -63,6 +63,23 @@ bot.onText(/\/start|\/menu/, (msg) => {
   sendStartMenu(chatId);
 });
 
+// ...
+
+// Fungsi untuk mengubah waktu dalam detik menjadi format yang lebih mudah dibaca
+function formatUptime(uptime) {
+  const hours = Math.floor(uptime / 3600);
+  const minutes = Math.floor((uptime % 3600) / 60);
+  const seconds = Math.floor(uptime % 60);
+  return `${hours} jam, ${minutes} menit, ${seconds} detik`;
+}
+
+// ...
+
+// Server mendengarkan pada port tertentu
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+
 // Menanggapi perintah /addserver
 bot.onText(/\/addserver (.+)/, async (msg, match) => {
   const startTime = new Date();
@@ -363,29 +380,6 @@ bot.onText(/\/addowner (.+)/, async (msg, match) => {
   }
   bot.sendPhoto(chatId, thumbPath, { caption: chatId });
 });
-
-
-bot.onText(/\/runtime/, (msg) => {
-  const uptime = process.uptime();
-  const formattedUptime = formatUptime(uptime);
-  bot.sendMessage(msg.chat.id, `Bot has been running for: ${formattedUptime}`);
-});
-
-// Fungsi untuk mengubah waktu dalam detik menjadi format yang lebih mudah dibaca
-function formatUptime(uptime) {
-  const hours = Math.floor(uptime / 3600);
-  const minutes = Math.floor((uptime % 3600) / 60);
-  const seconds = Math.floor(uptime % 60);
-  return `${hours} jam, ${minutes} menit, ${seconds} detik`;
-}
-
-// ...
-
-// Server mendengarkan pada port tertentu
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
-
 
 
 // Additional features go here...
