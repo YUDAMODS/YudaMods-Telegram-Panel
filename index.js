@@ -5,11 +5,14 @@ const axios = require('axios');
 const figlet = require('figlet');
 const chalk = require('chalk');
 const fs = require('fs');
-const token = 'YOUR_TELEGRAM_BOT_TOKEN';
-const pterodactylApiUrl = 'https://pterodactyl.example.com/api/application';
-const pterodactylApiKey = 'YOUR_PTERODACTYL_API_KEY';
-const ownerContact = '628xxx'; // Ganti dengan nomor kontak owner yang sebenarnya
-const thumbPath = './user.png'; // Ganti dengan path sesuai dengan lokasi file di sistem Anda
+
+
+const token = 'YOUR_TELEGRAM_BOT_TOKEN'; // Token Bot Bisa Di Dapatkan Dari t.me/BotFather
+const pterodactylApiUrl = 'https://pterodactyl.example.com/api/application'; // Ganti Domain Lu Tanpa Hapus /api/application
+const pterodactylApiKey = 'YOUR_PTERODACTYL_API_KEY'; // Ganti Apikey Panel
+const ownerContact = 'YOUR_OWNER_NUMBER'; // Ganti dengan nomor kontak owner yang sebenarnya Format 62
+const thumbPath = 'YOUR_URL_THUMB'; // Ganti Dengan Url Img Telegra
+
 const bot = new TelegramBot(token, { polling: true });
 
 // Figlet banner
@@ -36,8 +39,8 @@ bot.onText(/\/start/, (msg) => {
     "/owner - Melihat nomor kontak owner\n" +
     "/credits - Memberikan kredit pembuat bot";
   
-bot.sendMessage(chatId, startMessage, {
-    thumb: fs.readFileSync(thumbPath),
+  bot.sendMessage(chatId, startMessage, {
+    thumb: thumbPath,
   });
 });
 
@@ -46,26 +49,28 @@ bot.onText(/\/addserver (.+)/, async (msg, match) => {
     const serverName = match[1];
     const chatId = msg.chat.id;
 
-    // Pastikan hanya owner yang dapat menggunakan perintah ini
     if (msg.from.id.toString() !== ownerContact) {
       bot.sendMessage(chatId, 'Anda tidak memiliki izin untuk menggunakan perintah ini.');
       return;
     }
     
-    // Implementasi penambahan server ke Pterodactyl
     const response = await axios.post(`${pterodactylApiUrl}/servers`, {
       name: serverName,
-      // Sesuaikan dengan payload yang diperlukan oleh API Pterodactyl
     }, {
       headers: {
         Authorization: `Bearer ${pterodactylApiKey}`,
       },
     });
 
-    bot.sendMessage(chatId, `Server ${serverName} berhasil ditambahkan.`);
+    bot.sendMessage(chatId, `Server ${serverName} berhasil ditambahkan.`, {
+      thumb: thumbPath,
+    });
   } catch (error) {
     console.error('Error adding server:', error);
-    bot.sendMessage(chatId, 'Gagal menambahkan server.');
+    bot.sendMessage(ownerContact, `Error: ${error.message}`);
+    bot.sendMessage(chatId, 'Gagal menambahkan server.', {
+      thumb: thumbPath,
+    });
   }
 });
 
@@ -73,23 +78,26 @@ bot.onText(/\/adduser/, async (msg) => {
   try {
     const chatId = msg.chat.id;
 
-    // Pastikan hanya owner yang dapat menggunakan perintah ini
     if (msg.from.id.toString() !== ownerContact) {
       bot.sendMessage(chatId, 'Anda tidak memiliki izin untuk menggunakan perintah ini.');
       return;
     }
     
-    // Implementasi penambahan pengguna ke Pterodactyl tanpa argumen
     const response = await axios.post(`${pterodactylApiUrl}/users`, null, {
       headers: {
         Authorization: `Bearer ${pterodactylApiKey}`,
       },
     });
 
-    bot.sendMessage(chatId, 'Pengguna berhasil ditambahkan.');
+    bot.sendMessage(chatId, 'Pengguna berhasil ditambahkan.', {
+      thumb: thumbPath,
+    });
   } catch (error) {
     console.error('Error adding user:', error);
-    bot.sendMessage(chatId, 'Gagal menambahkan pengguna.');
+    bot.sendMessage(ownerContact, `Error: ${error.message}`);
+    bot.sendMessage(chatId, 'Gagal menambahkan pengguna.', {
+      thumb: thumbPath,
+    });
   }
 });
 
@@ -98,33 +106,34 @@ bot.onText(/\/addadmin (.+)/, async (msg, match) => {
     const adminUsername = match[1];
     const chatId = msg.chat.id;
 
-    // Pastikan hanya owner yang dapat menggunakan perintah ini
     if (msg.from.id.toString() !== ownerContact) {
       bot.sendMessage(chatId, 'Anda tidak memiliki izin untuk menggunakan perintah ini.');
       return;
     }
     
-    // Implementasi penambahan administrator ke Pterodactyl
     const response = await axios.post(`${pterodactylApiUrl}/users`, {
       username: adminUsername,
-      // Sesuaikan dengan payload yang diperlukan oleh API Pterodactyl
     }, {
       headers: {
         Authorization: `Bearer ${pterodactylApiKey}`,
       },
     });
 
-    // Berikan hak admin kepada pengguna yang baru ditambahkan
     await axios.post(`${pterodactylApiUrl}/users/${response.data.id}/administrative`, null, {
       headers: {
         Authorization: `Bearer ${pterodactylApiKey}`,
       },
     });
 
-    bot.sendMessage(chatId, `Administrator ${adminUsername} berhasil ditambahkan.`);
+    bot.sendMessage(chatId, `Administrator ${adminUsername} berhasil ditambahkan.`, {
+      thumb: thumbPath,
+    });
   } catch (error) {
     console.error('Error adding admin:', error);
-    bot.sendMessage(chatId, `Gagal menambahkan administrator. Error: ${error.message}`);
+    bot.sendMessage(ownerContact, `Error: ${error.message}`);
+    bot.sendMessage(chatId, `Gagal menambahkan administrator. Error: ${error.message}`, {
+      thumb: thumbPath,
+    });
   }
 });
 
@@ -133,13 +142,11 @@ bot.onText(/\/checkuser (.+)/, async (msg, match) => {
     const username = match[1];
     const chatId = msg.chat.id;
 
-    // Pastikan hanya owner yang dapat menggunakan perintah ini
     if (msg.from.id.toString() !== ownerContact) {
       bot.sendMessage(chatId, 'Anda tidak memiliki izin untuk menggunakan perintah ini.');
       return;
     }
 
-    // Implementasi pengecekan keberadaan pengguna di Pterodactyl
     const response = await axios.get(`${pterodactylApiUrl}/users`, {
       params: {
         filter: `username=${username}`,
@@ -150,13 +157,20 @@ bot.onText(/\/checkuser (.+)/, async (msg, match) => {
     });
 
     if (response.data.data.length > 0) {
-      bot.sendMessage(msg.chat.id, `User ${username} sudah terdaftar.`);
+      bot.sendMessage(chatId, `User ${username} sudah terdaftar.`, {
+        thumb: thumbPath,
+      });
     } else {
-      bot.sendMessage(msg.chat.id, `User ${username} belum terdaftar.`);
+      bot.sendMessage(chatId, `User ${username} belum terdaftar.`, {
+        thumb: thumbPath,
+      });
     }
   } catch (error) {
     console.error('Error checking user:', error);
-    bot.sendMessage(msg.chat.id, `Gagal melakukan pengecekan user. Error: ${error.message}`);
+    bot.sendMessage(ownerContact, `Error: ${error.message}`);
+    bot.sendMessage(chatId, `Gagal melakukan pengecekan user. Error: ${error.message}`, {
+      thumb: thumbPath,
+    });
   }
 });
 
