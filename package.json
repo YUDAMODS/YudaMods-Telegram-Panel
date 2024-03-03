@@ -1,23 +1,16 @@
 {
-  "name": "pterodactyl-telegram-bot",
+  "name": "yudamods-telegram-bot",
   "version": "1.0.0",
-  "description": "Telegram bot for Pterodactyl",
+  "description": "Telegram bot with additional features by YudaMods",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
-  "keywords": [
-    "pterodactyl",
-    "telegram",
-    "bot"
-  ],
-  "author": "YudaMods",
-  "license": "MIT",
-"dependencies": {
-  "node-telegram-bot-api": "^0.54.0",
-  "axios": "^0.24.0",
-  "figlet": "^1.5.0",
-  "chalk": "^4.1.2",
-  "fs": "0.0.1-security"
-}
+  "dependencies": {
+    "node-telegram-bot-api": "^0.55.0",
+    "axios": "^0.24.0",
+    "figlet": "^1.5.0",
+    "chalk": "^4.1.0",
+    "fs": "0.0.1-security"
+  }
 }
