@@ -1,21 +1,34 @@
 // By YudaMods
 // Taruh Credits
+
+// Import required modules
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 const figlet = require('figlet');
 const chalk = require('chalk');
-const fs = require('fs');
 const express = require('express');
+
+// Create an instance of Express
 const app = express();
 const port = 3000;
 
-const token = 'YOUR_TELEGRAM_BOT_TOKEN'; // Token Bot Bisa Di Dapatkan Dari t.me/BotFather
-const pterodactylApiUrl = 'https://pterodactyl.example.com/api/application'; // Ganti Domain Lu Tanpa Hapus /api/application
-const pterodactylApiKey = 'YOUR_PTERODACTYL_API_KEY'; // Ganti Apikey Panel
-let ownerContact = 'YOUR_OWNER_NUMBER'; // Ganti dengan nomor kontak owner yang sebenarnya Format Id
-const thumbPath = 'YOUR_URL_THUMB'; // Ganti Dengan Url Img Telegram
-const youtubeLink = 'https://youtube.com/@YUDAMODS'; // Link YouTube
+// Telegram Bot Token
+const token = 'YOUR_TELEGRAM_BOT_TOKEN';
 
+// Pterodactyl API configurations
+const pterodactylApiUrl = 'https://pterodactyl.example.com/api/application';
+const pterodactylApiKey = 'YOUR_PTERODACTYL_API_KEY';
+
+// Owner contact information
+let ownerContact = 'YOUR_OWNER_NUMBER';
+
+// URL for Telegram thumbnail
+const thumbPath = 'YOUR_URL_THUMB';
+
+// YouTube link
+const youtubeLink = 'https://youtube.com/@YUDAMODS';
+
+// Create a Telegram Bot instance
 const bot = new TelegramBot(token, { polling: true });
 
 // Figlet banner
@@ -24,16 +37,16 @@ figlet('YudaMods', (err, data) => {
     console.error('Error rendering figlet:', err);
     return;
   }
-  console.log(chalk.blue(data)); // Menggunakan chalk untuk memberikan warna biru
-  console.log(chalk.blue('Bot is Running...')); // Menampilkan pesan "Bot is Running..." dengan warna biru
+  console.log(chalk.blue(data)); // Use chalk to display in blue
+  console.log(chalk.blue('Bot is Running...'));
 });
 
-// Fungsi untuk menampilkan menu / start
+// Function to send start menu
 function sendStartMenu(chatId) {
   const startMessage = "Selamat datang di bot YudaMods!\n\n" +
     "Berikut adalah fitur yang tersedia:\n" +
     "/addserver [Nama Server] - Menambahkan server baru\n" +
-    "/adduser [Nama Pengguna] - Menambahkan pengguna baru\n" +
+    "/adduser - Menambahkan pengguna baru\n" +
     "/addadmin [Nama Admin] - Menambahkan administrator baru\n" +
     "/checkuser [Nama Pengguna] - Memeriksa keberadaan pengguna\n" +
     "/checkadmin [Nama Admin] - Memeriksa keberadaan administrator\n" +
@@ -45,7 +58,7 @@ function sendStartMenu(chatId) {
     "/addowner [ID Pengguna] - Menambahkan owner baru\n" +
     "/runtime - Informasi waktu eksekusi skrip";
 
-  // Menambahkan tombol YouTube
+  // Add YouTube button
   const keyboard = {
     reply_markup: {
       inline_keyboard: [
@@ -57,15 +70,13 @@ function sendStartMenu(chatId) {
   bot.sendPhoto(chatId, thumbPath, { caption: startMessage, ...keyboard });
 }
 
-// Menanggapi /start dan /menu
+// Handling /start and /menu commands
 bot.onText(/\/start|\/menu/, (msg) => {
   const chatId = msg.chat.id;
   sendStartMenu(chatId);
 });
 
-// ...
-
-// Fungsi untuk mengubah waktu dalam detik menjadi format yang lebih mudah dibaca
+// Function to format uptime
 function formatUptime(uptime) {
   const hours = Math.floor(uptime / 3600);
   const minutes = Math.floor((uptime % 3600) / 60);
@@ -73,9 +84,9 @@ function formatUptime(uptime) {
   return `${hours} jam, ${minutes} menit, ${seconds} detik`;
 }
 
-// ...
+// ... (continue the rest of your code)
 
-// Server mendengarkan pada port tertentu
+// Server listening on a specific port
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
